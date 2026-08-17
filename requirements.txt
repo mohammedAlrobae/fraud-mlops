@@ -1,0 +1,12 @@
+pandas
+numpy
+scikit-learn
+xgboost
+mlflow
+optuna
+bentoml
+kafka-python
+requests
+matplotlib
+seaborn
+dvc

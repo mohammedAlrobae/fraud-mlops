@@ -1,4 +1,20 @@
+# Virtual Environment & Bytecode
 .venv/
 __pycache__/
-kaggle.json
+*.pyc
 
+# Heavy Datasets (Keep DVC files tracked)
+data/raw/*.csv
+!data/raw/*.dvc
+data/processed/*.csv
+!data/processed/.gitkeep
+
+# MLflow Local Tracking Stores
+mlruns/*
+!mlruns/.gitkeep
+mlflow.db
+mlflow.db-journal
+
+# Secrets & Generated Reports
+kaggle.json
+reports/*.html

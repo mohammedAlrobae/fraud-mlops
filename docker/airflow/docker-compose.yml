@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  airflow:
+    build:
+      context: ../..
+      dockerfile: docker/airflow/Dockerfile
+    container_name: airflow_standalone
+    user: "${AIRFLOW_UID}:${AIRFLOW_GID}"
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    volumes:
+      - airflow_home:/opt/airflow
+      - ../../dags:/opt/airflow/dags
+      - ../../:/opt/airflow/project
+    ports:
+      - "8080:8080"
+
+volumes:
+  airflow_home:
