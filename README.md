@@ -1,6 +1,6 @@
-# End-to-End MLOps Financial Fraud Detection Pipeline
+# End-to-End MLOps Pipeline for Financial Fraud Detection
 
-An enterprise-grade, production-ready MLOps platform for detecting financial transaction fraud on large-scale tabular streams (based on the synthetic PaySim dataset of 6.36M+ transactions). This project implements the full machine learning engineering lifecycle: data versioning and lineage tracking with DVC, robust temporal preprocessing to eliminate train-serving skew and data leakage, XGBoost model training and Optuna hyperparameter optimization tracked via MLflow, real-time REST API model serving with BentoML, automated pipeline orchestration using Apache Airflow in Docker, infrastructure observability with Prometheus and Grafana, and statistical data and target drift detection with Evidently AI.
+An educational, end-to-end MLOps lifecycle implementation for detecting financial transaction fraud on the synthetic PaySim dataset (6.36M+ transactions). Designed as a practical, portfolio-grade engineering project, it demonstrates how to build and connect each stage of the machine learning operations lifecycle: data versioning with DVC, temporal feature engineering to eliminate train-serving skew and data leakage, XGBoost model training and Optuna Bayesian optimization tracked via MLflow, real-time REST API serving with BentoML, containerized retraining orchestration using Apache Airflow in Docker, metrics collection and visualization with Prometheus & Grafana, and automated statistical drift monitoring with Evidently AI.
 
 ---
 
@@ -9,33 +9,33 @@ An enterprise-grade, production-ready MLOps platform for detecting financial tra
 ```mermaid
 flowchart TD
     subgraph Data_Layer["1. Data & Lineage Layer"]
-        A["Raw Transactions (data/raw/paysim.csv)"] -->|Tracked by DVC| B["Temporal Split (src/preprocess.py)"]
-        B -->|Train (65%) / Val (15%) / Test (20%)| C["data/processed/*.csv"]
+        A["Raw Transactions (data/raw/paysim.csv)"] -->|"Tracked by DVC"| B["Temporal Split (src/preprocess.py)"]
+        B -->|"Train 65% / Val 15% / Test 20%"| C["data/processed/*.csv"]
     end
 
     subgraph Experimentation["2. Experimentation & Registry"]
         C --> D["Model Training (src/train.py)"]
         C --> E["Optuna HPO 30 Trials (src/tune.py)"]
-        D -->|Metrics, Params, Artifacts| F["MLflow Tracking (sqlite:///mlflow.db)"]
-        E -->|Metrics, Params, Artifacts| F
-        E -->|Register Best Model| G["MLflow Model Registry<br>(fraud-detection-model@champion)"]
+        D -->|"Metrics, Params, Artifacts"| F["MLflow Tracking (sqlite:///mlflow.db)"]
+        E -->|"Metrics, Params, Artifacts"| F
+        E -->|"Register Best Model"| G["MLflow Model Registry (fraud-detection-model@champion)"]
     end
 
-    subgraph Serving["3. Production Inference"]
-        G -->|Load @champion| H["BentoML Service (src/service.py)"]
-        H -->|Shared Feature Engineering| I["REST API Endpoint (/predict)"]
+    subgraph Serving["3. Model Serving"]
+        G -->|"Load @champion"| H["BentoML Service (src/service.py)"]
+        H -->|"Shared Feature Engineering"| I["REST API Endpoint (/predict)"]
     end
 
     subgraph Orchestration["4. Workflow Orchestration"]
-        J["Apache Airflow DAG (dags/retrain_pipeline.py)"] -->|Preprocess Task| B
-        J -->|Retrain Task| D
+        J["Apache Airflow DAG (dags/retrain_pipeline.py)"] -->|"Preprocess Task"| B
+        J -->|"Retrain Task"| D
     end
 
     subgraph Observability["5. Monitoring & Drift"]
-        H -->|Expose /metrics| K["Prometheus (port 9090)"]
-        K -->|PromQL Queries| L["Grafana Dashboards (port 3001)"]
+        H -->|"Expose /metrics"| K["Prometheus (port 9090)"]
+        K -->|"PromQL Queries"| L["Grafana Dashboards (port 3001)"]
         C --> M["Evidently AI (src/monitor_drift.py)"]
-        M -->|Statistical Report| N["reports/drift_report.html"]
+        M -->|"Statistical Report"| N["reports/drift_report.html"]
     end
 ```
 
@@ -50,7 +50,7 @@ flowchart TD
 | **XGBoost** | High-performance gradient boosted decision trees optimized for extreme class imbalance (`scale_pos_weight`). |
 | **Optuna** | Bayesian hyperparameter optimization (Tree-structured Parzen Estimator) maximizing Precision-Recall AUC (**PR-AUC**). |
 | **MLflow** | Experiment tracking, hyperparameter logging, model artifact storage, signature verification, and Model Registry management (`champion` alias). |
-| **BentoML** | High-throughput, production-ready microservice serving real-time model inference with shared feature engineering. |
+| **BentoML** | High-throughput microservice serving real-time model inference with shared feature engineering. |
 | **Apache Airflow** | Scheduled workflow orchestration containerized in Docker Standalone mode for automated retraining pipelines. |
 | **Prometheus** | Time-series database scraping service health and inference performance metrics every 5 seconds. |
 | **Grafana** | Operational dashboards visualizing request throughput (RPS), p95/p99 latencies, error rates, and alerting rules. |
@@ -165,7 +165,7 @@ Because financial fraud is heavily imbalanced (~0.08% positive rate), evaluating
 
 $$\text{Decision Rule: } \hat{y} = \begin{cases} 1 & \text{if } P(\text{isFraud} \mid \mathbf{x}) \ge 0.90 \\ 0 & \text{otherwise} \end{cases}$$
 
-### 3. Production Infrastructure & Volume Persistence
+### 3. Infrastructure & Volume Persistence
 * **WSL2 Docker Volume Permissions:** Configured explicit user mapping (`AIRFLOW_UID=1000`) and Docker named volumes (`airflow_home`, `prometheus_data`, `grafana_data`) to prevent container permission errors on Linux/WSL2 hosts.
 * **Airflow 3 Idempotent Authentication:** Implemented an automated [`entrypoint.sh`](file:///home/moalr/fraud-mlops/docker/airflow/entrypoint.sh) script ensuring fixed administrative credentials (`admin` / `admin123`) persist cleanly across container rebuilds and restarts without relying on transient stdout files.
 * **Host Gateway Scraping:** Utilized `extra_hosts: ["host.docker.internal:host-gateway"]` in Prometheus to allow the Docker container to reliably scrape the BentoML server running natively on the host (`http://localhost:3000/metrics`).
