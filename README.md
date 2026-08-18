@@ -1,6 +1,6 @@
 # End-to-End MLOps Pipeline for Financial Fraud Detection
 
-An educational, end-to-end MLOps lifecycle implementation for detecting financial transaction fraud on the synthetic PaySim dataset (6.36M+ transactions). Designed as a practical, portfolio-grade engineering project, it demonstrates how to build and connect each stage of the machine learning operations lifecycle: data versioning with DVC, temporal feature engineering to eliminate train-serving skew and data leakage, XGBoost model training and Optuna Bayesian optimization tracked via MLflow, real-time REST API serving with BentoML, containerized retraining orchestration using Apache Airflow in Docker, metrics collection and visualization with Prometheus & Grafana, and automated statistical drift monitoring with Evidently AI.
+An end-to-end MLOps lifecycle implementation for detecting financial transaction fraud on the synthetic PaySim dataset (6.36M+ transactions). Designed as a practical, portfolio-grade engineering project, it demonstrates how to build and connect each stage of the machine learning operations lifecycle: data versioning with DVC, temporal feature engineering to eliminate train-serving skew and data leakage, XGBoost model training and Optuna Bayesian optimization tracked via MLflow, real-time REST API serving with BentoML, containerized retraining orchestration using Apache Airflow in Docker, metrics collection and visualization with Prometheus & Grafana, and automated statistical drift monitoring with Evidently AI.
 
 ---
 
